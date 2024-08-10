@@ -1,5 +1,6 @@
 package com.example.ozonpriceparser.api.service.impl;
 
+import com.example.ozonpriceparser.api.errors.exceptions.ElementNotFoundException;
 import com.example.ozonpriceparser.api.service.PriceService;
 import com.microsoft.playwright.*;
 import lombok.AccessLevel;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PriceServiceImpl implements PriceService {
     @Override
-    public Integer getPrice(String url) {
+    public Integer getPrice(String url) throws ElementNotFoundException {
         Playwright playwright = Playwright.create();
         Browser browser = null;
         try {
@@ -25,15 +26,14 @@ public class PriceServiceImpl implements PriceService {
 
             ElementHandle elementHandle = page.querySelector("span.mn6_27.m6n_27.mo_27");
 
-            if (browser != null) {
+            if (browser != null && elementHandle != null) {
                 String price = elementHandle.innerText();
                 return priceToInt(price);
             } else {
-                throw new RuntimeException("Element not found");
+                throw new ElementNotFoundException("span.mn6_27.m6n_27.mo_27");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
+        } catch (ElementNotFoundException e) {
+            throw new ElementNotFoundException("span.mn6_27.m6n_27.mo_27");
         } finally {
             if (browser != null) {
                 browser.close();
