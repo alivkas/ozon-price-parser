@@ -1,4 +1,4 @@
-package com.example.ozonpriceparser.api.errors;
+package com.example.ozonpriceparser.errors;
 
 public record ExceptionResponse(String code, String exceptionTitle) {
 }

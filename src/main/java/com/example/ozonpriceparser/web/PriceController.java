@@ -2,7 +2,7 @@ package com.example.ozonpriceparser.web;
 
 import com.example.ozonpriceparser.api.dto.PageDto;
 import com.example.ozonpriceparser.api.dto.PageResponse;
-import com.example.ozonpriceparser.api.errors.exceptions.ElementNotFoundException;
+import com.example.ozonpriceparser.errors.exceptions.ElementNotFoundException;
 import com.example.ozonpriceparser.api.service.PriceService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

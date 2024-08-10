@@ -1,6 +1,7 @@
 package com.example.ozonpriceparser.api.service.impl;
 
-import com.example.ozonpriceparser.api.errors.exceptions.ElementNotFoundException;
+import com.example.ozonpriceparser.config.property.ElementsProperties;
+import com.example.ozonpriceparser.errors.exceptions.ElementNotFoundException;
 import com.example.ozonpriceparser.api.service.PriceService;
 import com.microsoft.playwright.*;
 import lombok.AccessLevel;
@@ -12,28 +13,30 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class PriceServiceImpl implements PriceService {
+    ElementsProperties elementsProperties;
+
     @Override
     public Integer getPrice(String url) throws ElementNotFoundException {
         Playwright playwright = Playwright.create();
         Browser browser = null;
         try {
             browser = playwright.chromium().launch();
-            BrowserContext browserContext = browser.newContext(new Browser.NewContextOptions().setUserAgent("Chrome/4.0.249.0 Safari/532.5"));
+            BrowserContext browserContext = browser.newContext(new Browser.NewContextOptions().setUserAgent(elementsProperties.userAgent()));
 
             Page page = browserContext.newPage();
             page.navigate(url);
             page.waitForTimeout(2000);
 
-            ElementHandle elementHandle = page.querySelector("span.mn6_27.m6n_27.mo_27");
+            ElementHandle elementHandle = page.querySelector(elementsProperties.page());
 
             if (browser != null && elementHandle != null) {
                 String price = elementHandle.innerText();
                 return priceToInt(price);
             } else {
-                throw new ElementNotFoundException("span.mn6_27.m6n_27.mo_27");
+                throw new ElementNotFoundException(elementsProperties.page());
             }
         } catch (ElementNotFoundException e) {
-            throw new ElementNotFoundException("span.mn6_27.m6n_27.mo_27");
+            throw new ElementNotFoundException(elementsProperties.page());
         } finally {
             if (browser != null) {
                 browser.close();

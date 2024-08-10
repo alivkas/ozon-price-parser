@@ -1,6 +1,6 @@
-package com.example.ozonpriceparser.api.errors;
+package com.example.ozonpriceparser.errors;
 
-import com.example.ozonpriceparser.api.errors.exceptions.ElementNotFoundException;
+import com.example.ozonpriceparser.errors.exceptions.ElementNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;

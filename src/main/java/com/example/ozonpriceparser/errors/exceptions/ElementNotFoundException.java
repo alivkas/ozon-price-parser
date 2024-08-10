@@ -1,4 +1,4 @@
-package com.example.ozonpriceparser.api.errors.exceptions;
+package com.example.ozonpriceparser.errors.exceptions;
 
 public class ElementNotFoundException extends Exception {
     public final String CODE = "500";
