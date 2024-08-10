@@ -18,6 +18,6 @@ public class PriceController {
 
     @PostMapping()
     public PageResponse getCurrentPrice(@RequestBody PageDto pageDto) throws ElementNotFoundException {
-        return new PageResponse(priceServiceImpl.getPrice(pageDto.url()));
+        return new PageResponse(priceServiceImpl.getPrice(pageDto.url()), null);
     }
 }

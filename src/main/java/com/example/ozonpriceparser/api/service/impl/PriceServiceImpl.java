@@ -1,5 +1,6 @@
 package com.example.ozonpriceparser.api.service.impl;
 
+import com.example.ozonpriceparser.api.Price;
 import com.example.ozonpriceparser.config.property.ElementsProperties;
 import com.example.ozonpriceparser.errors.exceptions.ElementNotFoundException;
 import com.example.ozonpriceparser.api.service.PriceService;
@@ -8,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+
+import java.io.*;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -45,11 +48,28 @@ public class PriceServiceImpl implements PriceService {
         }
     }
 
-    @Override
-    public Integer priceToInt(String price) {
+    private Integer priceToInt(String price) {
         String normalPrice = price
                 .replace("₽", "")
                 .replace(" ", "");
         return Integer.parseInt(normalPrice);
+    }
+
+    @Override
+    public void serializePrice(String url) throws ElementNotFoundException, IOException {
+        Price price = new Price(getPrice(url));
+        FileOutputStream outputStream = new FileOutputStream("src/main/resources/price/serialize price.txt");
+        ObjectOutputStream objectOutputStream =new ObjectOutputStream(outputStream);
+        objectOutputStream.writeObject(price);
+        objectOutputStream.close();
+    }
+
+    @Override
+    public Integer deserializePrice() throws IOException, ClassNotFoundException {
+        FileInputStream inputStream = new FileInputStream("src/main/resources/price/serialize price.txt");
+        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+        Price price = (Price) objectInputStream.readObject();
+        objectInputStream.close();
+        return price.getPrice();
     }
 }
