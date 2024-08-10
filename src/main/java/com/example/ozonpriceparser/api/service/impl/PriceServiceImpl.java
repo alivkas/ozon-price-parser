@@ -14,19 +14,32 @@ public class PriceServiceImpl implements PriceService {
     @Override
     public Integer getPrice(String url) {
         Playwright playwright = Playwright.create();
-        Browser browser = playwright.chromium().launch();
-        BrowserContext browserContext = browser.newContext(new Browser.NewContextOptions().setUserAgent("Chrome/4.0.249.0 Safari/532.5"));
+        Browser browser = null;
+        try {
+            browser = playwright.chromium().launch();
+            BrowserContext browserContext = browser.newContext(new Browser.NewContextOptions().setUserAgent("Chrome/4.0.249.0 Safari/532.5"));
 
-        Page page = browserContext.newPage();
-        page.navigate(url);
-        page.waitForTimeout(2000);
+            Page page = browserContext.newPage();
+            page.navigate(url);
+            page.waitForTimeout(2000);
 
-        ElementHandle elementHandle = page.querySelector("span.mn6_27.m6n_27.mo_27");
-        String price = elementHandle.innerText();
+            ElementHandle elementHandle = page.querySelector("span.mn6_27.m6n_27.mo_27");
 
-        browser.close();
-
-        return priceToInt(price);
+            if (browser != null) {
+                String price = elementHandle.innerText();
+                return priceToInt(price);
+            } else {
+                throw new RuntimeException("Element not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            if (browser != null) {
+                browser.close();
+            }
+            playwright.close();
+        }
     }
 
     @Override
