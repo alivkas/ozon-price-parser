@@ -1,6 +1,7 @@
 package com.example.ozonpriceparser.api.service.impl;
 
 import com.example.ozonpriceparser.api.Price;
+import com.example.ozonpriceparser.api.events.PriceEvent;
 import com.example.ozonpriceparser.config.property.ElementsProperties;
 import com.example.ozonpriceparser.errors.exceptions.ElementNotFoundException;
 import com.example.ozonpriceparser.api.service.PriceService;
@@ -8,6 +9,7 @@ import com.microsoft.playwright.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -16,10 +18,13 @@ import java.io.*;
 @RequiredArgsConstructor
 @Service
 public class PriceServiceImpl implements PriceService {
+
     ElementsProperties elementsProperties;
+    ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public Integer getPrice(String url) throws ElementNotFoundException {
+        applicationEventPublisher.publishEvent(new PriceEvent(url));
         Playwright playwright = Playwright.create();
         Browser browser = null;
         try {
@@ -71,5 +76,10 @@ public class PriceServiceImpl implements PriceService {
         Price price = (Price) objectInputStream.readObject();
         objectInputStream.close();
         return price.getPrice();
+    }
+
+    @Override
+    public Integer getDifferencePrice() {
+        return null;
     }
 }
