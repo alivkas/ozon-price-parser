@@ -4,7 +4,6 @@ import com.example.ozonpriceparser.api.events.PriceEvent;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -15,11 +14,13 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class PriceEventListener {
     String url;
+    Integer price;
     boolean isReadyToWork = false;
 
     @EventListener
     public void handlePriceEvent(PriceEvent event) {
         url = event.url();
+        price = event.price();
         if (!url.isEmpty()) {
             isReadyToWork = true;
             log.info("{}, успешно сохранено", url);

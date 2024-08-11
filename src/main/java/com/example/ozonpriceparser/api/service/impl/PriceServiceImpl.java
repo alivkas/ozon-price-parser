@@ -2,6 +2,7 @@ package com.example.ozonpriceparser.api.service.impl;
 
 import com.example.ozonpriceparser.api.Price;
 import com.example.ozonpriceparser.api.events.PriceEvent;
+import com.example.ozonpriceparser.api.listeners.PriceEventListener;
 import com.example.ozonpriceparser.config.property.ElementsProperties;
 import com.example.ozonpriceparser.errors.exceptions.ElementNotFoundException;
 import com.example.ozonpriceparser.api.service.PriceService;
@@ -21,10 +22,10 @@ public class PriceServiceImpl implements PriceService {
 
     ElementsProperties elementsProperties;
     ApplicationEventPublisher applicationEventPublisher;
+    PriceEventListener priceEventListener;
 
     @Override
     public Integer getPrice(String url) throws ElementNotFoundException {
-        applicationEventPublisher.publishEvent(new PriceEvent(url));
         Playwright playwright = Playwright.create();
         Browser browser = null;
         try {
@@ -39,6 +40,7 @@ public class PriceServiceImpl implements PriceService {
 
             if (browser != null && elementHandle != null) {
                 String price = elementHandle.innerText();
+                applicationEventPublisher.publishEvent(new PriceEvent(url, priceToInt(price)));
                 return priceToInt(price);
             } else {
                 throw new ElementNotFoundException(elementsProperties.page());
@@ -61,8 +63,8 @@ public class PriceServiceImpl implements PriceService {
     }
 
     @Override
-    public void serializePrice(String url) throws ElementNotFoundException, IOException {
-        Price price = new Price(getPrice(url));
+    public void serializePrice() throws IOException {
+        Price price = new Price(priceEventListener.getPrice());
         FileOutputStream outputStream = new FileOutputStream("src/main/resources/price/serialize price.txt");
         ObjectOutputStream objectOutputStream =new ObjectOutputStream(outputStream);
         objectOutputStream.writeObject(price);

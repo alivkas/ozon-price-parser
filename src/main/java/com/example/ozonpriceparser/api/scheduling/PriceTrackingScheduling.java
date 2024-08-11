@@ -17,14 +17,13 @@ import java.io.IOException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class PriceTrackingScheduling {
-
     PriceService priceServiceImpl;
     PriceEventListener priceEventListener;
 
-    @Scheduled(fixedDelay = 5000)
-    public void trackingPrice() throws ElementNotFoundException, IOException, InterruptedException, ClassNotFoundException {
+    @Scheduled(fixedDelayString = "${delay.time}")
+    public void trackingPrice() throws ElementNotFoundException, IOException {
         if (priceEventListener.isReadyToWork()) {
-            priceServiceImpl.serializePrice(priceEventListener.getUrl());
+            priceServiceImpl.serializePrice();
             log.info("Объект сериализован");
         }
     }

@@ -1,3 +1,6 @@
 element:
   page: ${PAGE_ELEMENT}
   userAgent: "Chrome/4.0.249.0 Safari/532.5"
+
+delay:
+  time: "5000"
