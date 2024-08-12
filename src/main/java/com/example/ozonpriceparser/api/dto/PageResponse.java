@@ -1,4 +1,6 @@
 package com.example.ozonpriceparser.api.dto;
 
-public record PageResponse(Integer price, Integer differencePrice) {
+public record PageResponse(Integer price,
+                           Integer differencePrice,
+                           String title) {
 }

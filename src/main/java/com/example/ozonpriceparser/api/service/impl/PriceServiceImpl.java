@@ -39,17 +39,20 @@ public class PriceServiceImpl implements PriceService {
             page.navigate(url);
             page.waitForTimeout(2000);
 
-            ElementHandle elementHandle = page.querySelector(elementsProperties.page());
+            ElementHandle handlePrice = page.querySelector(elementsProperties.elementPrice());
+            ElementHandle handleTitle = page.querySelector(elementsProperties.elementTitle());
 
-            if (browser != null && elementHandle != null) {
-                String price = elementHandle.innerText();
-                applicationEventPublisher.publishEvent(new PriceEvent(url, priceToInt(price)));
+            if (browser != null && handlePrice != null && handleTitle != null) {
+                String price = handlePrice.innerText();
+                applicationEventPublisher.publishEvent(new PriceEvent(url, handleTitle.innerText(), priceToInt(price)));
                 return priceToInt(price);
             } else {
-                throw new ElementNotFoundException(elementsProperties.page());
+                throw new ElementNotFoundException(elementsProperties.elementPrice(),
+                        elementsProperties.elementTitle());
             }
         } catch (ElementNotFoundException e) {
-            throw new ElementNotFoundException(elementsProperties.page());
+            throw new ElementNotFoundException(elementsProperties.elementPrice(),
+                    elementsProperties.elementTitle());
         } finally {
             if (browser != null) {
                 browser.close();
@@ -92,15 +95,16 @@ public class PriceServiceImpl implements PriceService {
     public PageResponse getDifferencePrice(String url) throws IOException, ClassNotFoundException, ElementNotFoundException {
         Integer currentPrice = getPrice(url);
         Integer oldPrice = deserializePrice();
+        String title = priceEventListener.getTitle();
         Integer diffPrice = currentPrice - oldPrice;
 
         if (diffPrice > 0) {
-            log.info("Цена увеличилась, +{}", diffPrice);
+            log.info("Цена увеличилась, +{}, товар: {}", diffPrice, title);
         } else if (diffPrice < 0) {
-            log.info("Цена упала, {}", diffPrice);
+            log.info("Цена упала, {}, товар: {}", diffPrice, title);
         } else {
-            log.info("Цена не изменилась");
+            log.info("Цена не изменилась, товар: {}", title);
         }
-        return new PageResponse(currentPrice, diffPrice);
+        return new PageResponse(currentPrice, diffPrice, title);
     }
 }

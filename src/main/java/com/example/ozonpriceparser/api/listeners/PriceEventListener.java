@@ -22,6 +22,8 @@ public class PriceEventListener {
     @NonFinal
     String url;
     @NonFinal
+    String title;
+    @NonFinal
     Integer price;
     @NonFinal
     boolean isReadyToWork = false;
@@ -30,6 +32,7 @@ public class PriceEventListener {
     public void handlePriceEvent(PriceEvent event) {
         url = event.url();
         price = event.price();
+        title = event.title();
         if (!url.isEmpty()) {
             isReadyToWork = true;
             log.info("{}, успешно сохранено", url);
