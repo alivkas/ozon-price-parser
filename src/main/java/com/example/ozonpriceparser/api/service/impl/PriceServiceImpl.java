@@ -1,6 +1,7 @@
 package com.example.ozonpriceparser.api.service.impl;
 
 import com.example.ozonpriceparser.api.Price;
+import com.example.ozonpriceparser.api.dto.PageResponse;
 import com.example.ozonpriceparser.api.events.PriceEvent;
 import com.example.ozonpriceparser.api.listeners.PriceEventListener;
 import com.example.ozonpriceparser.config.property.ElementsProperties;
@@ -10,11 +11,13 @@ import com.microsoft.playwright.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Service
@@ -81,7 +84,20 @@ public class PriceServiceImpl implements PriceService {
     }
 
     @Override
-    public Integer getDifferencePrice() {
-        return null;
+    public PageResponse getDifferencePrice(String url) throws IOException, ClassNotFoundException, ElementNotFoundException {
+        Integer currentPrice = getPrice(url);
+        Integer oldPrice = deserializePrice();
+        Integer diffPrice = currentPrice - oldPrice;
+
+        applicationEventPublisher.publishEvent("ok");
+
+        if (diffPrice > 0) {
+            log.info("Цена увеличилась, +{}", diffPrice);
+        } else if (diffPrice < 0) {
+            log.info("Цена упала, {}", diffPrice);
+        } else {
+            log.info("Цена не изменилась");
+        }
+        return new PageResponse(currentPrice, diffPrice);
     }
 }

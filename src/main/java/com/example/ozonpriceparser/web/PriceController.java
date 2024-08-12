@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -17,7 +19,7 @@ public class PriceController {
     PriceService priceServiceImpl;
 
     @PostMapping()
-    public PageResponse getCurrentPrice(@RequestBody PageDto pageDto) throws ElementNotFoundException {
-        return new PageResponse(priceServiceImpl.getPrice(pageDto.url()), null);
+    public PageResponse getCurrentPrice(@RequestBody PageDto pageDto) throws ElementNotFoundException, IOException, ClassNotFoundException {
+        return priceServiceImpl.getDifferencePrice(pageDto.url());
     }
 }
