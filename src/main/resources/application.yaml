@@ -3,4 +3,4 @@ element:
   userAgent: "Chrome/4.0.249.0 Safari/532.5"
 
 delay:
-  time: "10000"
+  time: "1000000"

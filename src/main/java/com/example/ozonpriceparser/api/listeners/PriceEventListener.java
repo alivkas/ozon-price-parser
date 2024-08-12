@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Getter
 @Slf4j
 public class PriceEventListener {
-    PriceService priceServiceImpl;
+    //PriceService priceServiceImpl;
 
     @NonFinal
     String url;

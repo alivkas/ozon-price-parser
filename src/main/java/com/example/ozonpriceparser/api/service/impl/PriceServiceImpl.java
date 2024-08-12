@@ -76,7 +76,12 @@ public class PriceServiceImpl implements PriceService {
 
     @Override
     public Integer deserializePrice() throws IOException, ClassNotFoundException {
-        FileInputStream inputStream = new FileInputStream("src/main/resources/price/serialize price.txt");
+        File file = new File("src/main/resources/price/serialize price.txt");
+        if (file.length() == 0) {
+            serializePrice();
+        }
+
+        FileInputStream inputStream = new FileInputStream(file);
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
         Price price = (Price) objectInputStream.readObject();
         objectInputStream.close();
@@ -88,8 +93,6 @@ public class PriceServiceImpl implements PriceService {
         Integer currentPrice = getPrice(url);
         Integer oldPrice = deserializePrice();
         Integer diffPrice = currentPrice - oldPrice;
-
-        applicationEventPublisher.publishEvent("ok");
 
         if (diffPrice > 0) {
             log.info("Цена увеличилась, +{}", diffPrice);
