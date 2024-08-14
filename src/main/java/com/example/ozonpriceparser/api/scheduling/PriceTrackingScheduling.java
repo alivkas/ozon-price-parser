@@ -1,5 +1,6 @@
 package com.example.ozonpriceparser.api.scheduling;
 
+import com.example.ozonpriceparser.api.PriceSerial;
 import com.example.ozonpriceparser.api.listeners.PriceEventListener;
 import com.example.ozonpriceparser.api.service.PriceService;
 import com.example.ozonpriceparser.errors.exceptions.ElementNotFoundException;
@@ -18,7 +19,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class PriceTrackingScheduling {
     PriceService priceServiceImpl;
-    PriceEventListener priceEventListener;
+    transient PriceEventListener priceEventListener;
 
     @Scheduled(fixedDelayString = "${delay.time}")
     public void trackingPrice() throws ElementNotFoundException, IOException {

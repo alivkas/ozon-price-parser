@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>ozon-price-parser</artifactId>
+    <artifactId>ozon-priceSerial-parser</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ozon-price-parser</name>
-    <description>ozon-price-parser</description>
+    <name>ozon-priceSerial-parser</name>
+    <description>ozon-priceSerial-parser</description>
     <url/>
     <licenses>
         <license/>

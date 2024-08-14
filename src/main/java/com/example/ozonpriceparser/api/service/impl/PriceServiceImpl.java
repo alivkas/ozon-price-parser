@@ -1,6 +1,7 @@
 package com.example.ozonpriceparser.api.service.impl;
 
-import com.example.ozonpriceparser.api.Price;
+import com.example.ozonpriceparser.api.PriceSerial;
+import com.example.ozonpriceparser.api.dto.PageDto;
 import com.example.ozonpriceparser.api.dto.PageResponse;
 import com.example.ozonpriceparser.api.events.PriceEvent;
 import com.example.ozonpriceparser.api.listeners.PriceEventListener;
@@ -28,7 +29,7 @@ public class PriceServiceImpl implements PriceService {
     PriceEventListener priceEventListener;
 
     @Override
-    public Integer getPrice(String url) throws ElementNotFoundException {
+    public PageDto getPrice(String url) throws ElementNotFoundException {
         Playwright playwright = Playwright.create();
         Browser browser = null;
         try {
@@ -42,10 +43,10 @@ public class PriceServiceImpl implements PriceService {
             ElementHandle handlePrice = page.querySelector(elementsProperties.elementPrice());
             ElementHandle handleTitle = page.querySelector(elementsProperties.elementTitle());
 
-            if (browser != null && handlePrice != null && handleTitle != null) {
+            if (handlePrice != null && handleTitle != null) {
                 String price = handlePrice.innerText();
                 applicationEventPublisher.publishEvent(new PriceEvent(url, handleTitle.innerText(), priceToInt(price)));
-                return priceToInt(price);
+                return new PageDto(url, handleTitle.innerText(), priceToInt(price));
             } else {
                 throw new ElementNotFoundException(elementsProperties.elementPrice(),
                         elementsProperties.elementTitle());
@@ -69,16 +70,17 @@ public class PriceServiceImpl implements PriceService {
     }
 
     @Override
-    public void serializePrice() throws IOException {
-        Price price = new Price(priceEventListener.getPrice());
+    public void serializePrice() throws IOException, ElementNotFoundException {
+        PageDto pageInfo = getPrice(priceEventListener.getUrl());
+        PriceSerial priceSerial = new PriceSerial(pageInfo.price(), pageInfo.title());
         FileOutputStream outputStream = new FileOutputStream("src/main/resources/price/serialize price.txt");
-        ObjectOutputStream objectOutputStream =new ObjectOutputStream(outputStream);
-        objectOutputStream.writeObject(price);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        objectOutputStream.writeObject(priceSerial);
         objectOutputStream.close();
     }
 
     @Override
-    public Integer deserializePrice() throws IOException, ClassNotFoundException {
+    public PriceSerial deserializePrice() throws IOException, ClassNotFoundException, ElementNotFoundException {
         File file = new File("src/main/resources/price/serialize price.txt");
         if (file.length() == 0) {
             serializePrice();
@@ -86,25 +88,34 @@ public class PriceServiceImpl implements PriceService {
 
         FileInputStream inputStream = new FileInputStream(file);
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-        Price price = (Price) objectInputStream.readObject();
+        PriceSerial priceSerial = (PriceSerial) objectInputStream.readObject();
         objectInputStream.close();
-        return price.getPrice();
+        return priceSerial;
     }
 
     @Override
     public PageResponse getDifferencePrice(String url) throws IOException, ClassNotFoundException, ElementNotFoundException {
-        Integer currentPrice = getPrice(url);
-        Integer oldPrice = deserializePrice();
-        String title = priceEventListener.getTitle();
-        Integer diffPrice = currentPrice - oldPrice;
+        Integer currentPrice = getPrice(url).price();
+        String currentTitle = priceEventListener.getTitle();
+        Integer oldPrice = deserializePrice().getPrice();
+        String oldTitle = deserializePrice().getTitle();
+
+        int diffPrice;
+
+        if (!oldTitle.equals(currentTitle)) {
+            serializePrice();
+            oldPrice = getPrice(url).price();
+            oldTitle = currentTitle;
+        }
+        diffPrice = currentPrice - oldPrice;
 
         if (diffPrice > 0) {
-            log.info("Цена увеличилась, +{}, товар: {}", diffPrice, title);
+            log.info("Цена увеличилась, +{}, товар: {}", diffPrice, currentTitle);
         } else if (diffPrice < 0) {
-            log.info("Цена упала, {}, товар: {}", diffPrice, title);
+            log.info("Цена упала, {}, товар: {}", diffPrice, currentTitle);
         } else {
-            log.info("Цена не изменилась, товар: {}", title);
+            log.info("Цена не изменилась, товар: {}", currentTitle);
         }
-        return new PageResponse(currentPrice, diffPrice, title);
+        return new PageResponse(currentPrice, diffPrice, currentTitle);
     }
 }
