@@ -1,7 +1,7 @@
 package com.example.ozonpriceparser.api.listeners;
 
 import com.example.ozonpriceparser.api.events.PriceEvent;
-import com.example.ozonpriceparser.api.service.PriceService;
+import com.example.ozonpriceparser.errors.exceptions.UrlNotFoundException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 @Getter
 @Slf4j
 public class PriceEventListener {
-    //PriceService priceServiceImpl;
-
     @NonFinal
     String url;
     @NonFinal
@@ -29,7 +27,7 @@ public class PriceEventListener {
     boolean isReadyToWork = false;
 
     @EventListener
-    public void handlePriceEvent(PriceEvent event) {
+    public void handlePriceEvent(PriceEvent event) throws UrlNotFoundException {
         url = event.url();
         price = event.price();
         title = event.title();
@@ -38,6 +36,7 @@ public class PriceEventListener {
             log.info("{}, успешно сохранено", url);
         } else {
             log.info("Ссылка не найдена");
+            throw new UrlNotFoundException(url);
         }
     }
 }

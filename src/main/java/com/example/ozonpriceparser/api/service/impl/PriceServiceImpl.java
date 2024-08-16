@@ -45,7 +45,6 @@ public class PriceServiceImpl implements PriceService {
 
             if (handlePrice != null && handleTitle != null) {
                 String price = handlePrice.innerText();
-                //applicationEventPublisher.publishEvent(new PriceEvent(url, handleTitle.innerText(), priceToInt(price)));
                 return new PageDto(url, handleTitle.innerText(), priceToInt(price));
             } else {
                 throw new ElementNotFoundException(elementsProperties.elementPrice(),
