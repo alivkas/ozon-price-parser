@@ -19,7 +19,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class PriceTrackingScheduling {
     PriceService priceServiceImpl;
-    transient PriceEventListener priceEventListener;
+    PriceEventListener priceEventListener;
 
     @Scheduled(fixedDelayString = "${delay.time}")
     public void trackingPrice() throws ElementNotFoundException, IOException {

@@ -45,7 +45,7 @@ public class PriceServiceImpl implements PriceService {
 
             if (handlePrice != null && handleTitle != null) {
                 String price = handlePrice.innerText();
-                applicationEventPublisher.publishEvent(new PriceEvent(url, handleTitle.innerText(), priceToInt(price)));
+                //applicationEventPublisher.publishEvent(new PriceEvent(url, handleTitle.innerText(), priceToInt(price)));
                 return new PageDto(url, handleTitle.innerText(), priceToInt(price));
             } else {
                 throw new ElementNotFoundException(elementsProperties.elementPrice(),
@@ -95,8 +95,11 @@ public class PriceServiceImpl implements PriceService {
 
     @Override
     public PageResponse getDifferencePrice(String url) throws IOException, ClassNotFoundException, ElementNotFoundException {
-        Integer currentPrice = getPrice(url).price();
-        String currentTitle = priceEventListener.getTitle();
+        PageDto pageInfo = getPrice(url);
+        applicationEventPublisher.publishEvent(new PriceEvent(url, pageInfo.title(), pageInfo.price()));
+
+        Integer currentPrice = pageInfo.price();
+        String currentTitle = pageInfo.title();
         Integer oldPrice = deserializePrice().getPrice();
         String oldTitle = deserializePrice().getTitle();
 
