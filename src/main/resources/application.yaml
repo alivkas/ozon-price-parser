@@ -5,3 +5,7 @@ element:
 
 delay:
   time: "3600000"
+
+bot:
+  token: ${TOKEN}
+  name: ${BOT_NAME}
